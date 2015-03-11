@@ -158,20 +158,18 @@ Lets create a new factor variable in the dataset with two levels - "weekday" and
 fdata$wd <- weekdays(fdata$date)
 fdata$wd[grep("Monday|Tuesday|Wednesday|Thursday|Friday", fdata$wd)] <- "weekday"
 fdata$wd[grep("Saturday|Sunday", fdata$wd)] <- "weekend"
+fdata <- transform(fdata, wd=factor(wd))
 ```
 Now lets calculate avearage number of steps per interval on weekdays and weekends:
 
 ```r
-weekend.data <- aggregate(fdata[fdata$wd=="weekend","steps"],by=list(fdata[fdata$wd=="weekend","interval"]), FUN=mean)
-weekday.data <- aggregate(fdata[fdata$wd=="weekday","steps"],by=list(fdata[fdata$wd=="weekday","interval"]), FUN=mean)
+fdata.avg <- aggregate(steps ~ wd+interval, fdata, mean)
 ```
 Now lets plot the comparison:
 
 ```r
-par(mfrow=c(2,1),oma = c(5,4,0,0) + 0.1,mar = c(0,0,1,1) + 0.1)
-plot(weekend.data, type="l", main="weekend", xaxt="n", col="blue")
-plot(weekday.data, type="l", main="weekday", col="blue")
-title(ylab="Number of steps", xlab="Interval", outer=TRUE, line=3)
+library(lattice)
+xyplot(steps ~ interval | wd, data = fdata.avg, layout=c(1,2), type="l", ylab="Number of steps", xlab="Interval")
 ```
 
 ![](PA1_template_files/figure-html/unnamed-chunk-18-1.png) 
